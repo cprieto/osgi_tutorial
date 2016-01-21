@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "osgi"
 
 configurations {
     felix
@@ -21,6 +22,16 @@ dependencies {
     felix 'felix:org.apache.felix.main.distribution:5.4.0:class@zip'
 }
 
+jar {
+    manifest {
+        name = "Service listener example"
+        version = project.version
+        description = "A bundle that displays messages at startup and when service events occur"
+        vendor = "Apache Felix"
+        instruction 'Bundle-Activator', 'tutorial.example1.Activator'
+    }
+}
+
 task felix(type: Copy, dependsOn: jar) {
     def felixVersion = (configurations.felix.dependencies.version =~ /\d+\.\d+\.\d+/)[0]
     def zipPath = configurations.felix[0]
@@ -38,6 +49,6 @@ task felix(type: Copy, dependsOn: jar) {
         main = "-jar"
         args "${felixDir}/bin/felix.jar"
         systemProperty "felix.auto.deploy.dir", "${felixDir}/bundle"
-        systemProperty "felix.auto.deploy.action", "start ${bundle}"
+        systemProperty "felix.auto.deploy.action", "start file:${bundle}"
     }
 }
