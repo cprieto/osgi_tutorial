@@ -1,5 +1,11 @@
 apply plugin: "java"
 
+configurations {
+    felix
+
+    compile.extendsFrom(felix)
+}
+
 repositories {
     mavenCentral()
     ivy {
@@ -12,4 +18,26 @@ repositories {
 
 dependencies {
     compile "org.apache.felix:org.apache.felix.framework:5.4.0"
+    felix 'felix:org.apache.felix.main.distribution:5.4.0:class@zip'
+}
+
+task felix(type: Copy, dependsOn: jar) {
+    def felixVersion = (configurations.felix.dependencies.version =~ /\d+\.\d+\.\d+/)[0]
+    def zipPath = configurations.felix[0]
+    def zipFile = file(zipPath)
+    def outDir = "${projectDir}/"
+
+    from zipTree(zipFile)
+    into outDir
+
+    def felixDir = "${outDir}/felix-framework-${felixVersion}"
+
+    def bundle = jar.archivePath
+
+    javaexec {
+        main = "-jar"
+        args "${felixDir}/bin/felix.jar"
+        systemProperty "felix.auto.deploy.dir", "${felixDir}/bundle"
+        systemProperty "felix.auto.deploy.action", "start ${bundle}"
+    }
 }
