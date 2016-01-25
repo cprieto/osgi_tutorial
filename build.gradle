@@ -33,7 +33,7 @@ jar {
         version = project.version
         description = "A bundle that displays messages at startup and when service events occur"
         vendor = "Apache Felix"
-        instruction 'Bundle-Activator', 'tutorial.example1.Activator'
+        instruction 'Bundle-Activator', 'tutorial.example1.KotlinActivator'
     }
 }
 
